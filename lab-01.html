@@ -567,20 +567,21 @@ attractions?</em></p>
 data.</em></p>
 <pre class="r"><code>visitors %&gt;% 
   summarise(
-    mean_2021=mean(n_2021),
-    med_2021=median(n_2021)
+    mean_2021=mean(n_2021,na.rm=TRUE),
+    med_2021=median(n_2021,na.rm=TRUE)
   )</code></pre>
 <pre><code>## # A tibble: 1 × 2
 ##   mean_2021 med_2021
 ##       &lt;dbl&gt;    &lt;dbl&gt;
-## 1        NA       NA</code></pre>
+## 1   232431.   129829</code></pre>
 <p>All values in the output are <code>NA</code>!</p>
 </div>
 <div id="exercise-i." class="section level3">
 <h3>Exercise i.</h3>
 <p><em>What does <code>NA</code> stand for and why are you getting this
 as your answer to the previous question.</em></p>
-<p><strong>Write your answer here</strong></p>
+<p>NA stands for Not Available,means this value is missing.We need to
+add na.rm=TRUE to ignore missing value.</p>
 </div>
 <div id="exercise-j." class="section level3">
 <h3>Exercise j.</h3>
@@ -588,7 +589,8 @@ as your answer to the previous question.</em></p>
 <code>median()</code> commands to see what the input argument
 <code>na.rm</code> does. Edit your code from exercise h so that it
 computes the summary statistics where data is available.</em></p>
-<p><strong>Write your answer here</strong></p>
+<p>summarise( mean_2021=mean(n_2021,na.rm=TRUE),
+med_2021=median(n_2021,na.rm=TRUE)</p>
 </div>
 </div>
 <div id="question-7" class="section level2">
@@ -612,18 +614,24 @@ visitor numbers in 2022?</em></p>
 <p><em>Observe in question 6 that the mean statistics across all
 settings are much larger than the corresponding median statistics.
 Discuss in your group what this suggests about the data.</em></p>
-<p><strong>Write your answer here</strong></p>
+<p>As mean is larger than median,so data is positively skewed.Because
+median is not affected by extreme large or values,so median is
+represented number more typically.</p>
 </div>
 </div>
 <div id="question-8" class="section level2">
 <h2>Question 8</h2>
 <div id="exercise-l." class="section level3">
 <h3>Exercise l.</h3>
-<pre class="r"><code>#visitors %&gt;% 
-#  summarise(
-#     __________,
-#     __________,
-#  )</code></pre>
+<pre class="r"><code>visitors %&gt;% 
+  summarise(
+     mean_2021=mean(n_2021,na.rm=TRUE),
+     med_2021=median(n_2021,na.rm=TRUE),
+  )</code></pre>
+<pre><code>## # A tibble: 1 × 2
+##   mean_2021 med_2021
+##       &lt;dbl&gt;    &lt;dbl&gt;
+## 1   232431.   129829</code></pre>
 </div>
 </div>
 <div id="question-9" class="section level2">
@@ -658,8 +666,16 @@ visitors_with_nations %&gt;%
 <p><em>How many tourist attractions are there in each of the 4 nations?
 From this, discuss in your group how reliable you think the
 inter-quartile estimates are.</em></p>
-<pre class="r"><code>#________ %&gt;%
-#  ______(_______)</code></pre>
+<pre class="r"><code>visitors_with_nations %&gt;%
+  group_by(nation) %&gt;%
+  summarise(count_attractions=n())</code></pre>
+<pre><code>## # A tibble: 4 × 2
+##   nation           count_attractions
+##   &lt;chr&gt;                        &lt;int&gt;
+## 1 England                        240
+## 2 Northern Ireland                 9
+## 3 Scotland                        97
+## 4 Wales                            2</code></pre>
 </div>
 </div>
 </div>
@@ -669,7 +685,20 @@ inter-quartile estimates are.</em></p>
 <h3>Exercise n.</h3>
 <p><em>Within each of the 4 nations, what is the proportion of tourist
 attractions that have free admission for all visitors?</em></p>
-<pre class="r"><code># Write your code here</code></pre>
+<pre class="r"><code>visitors_with_nations %&gt;%
+  group_by(nation) %&gt;%
+  summarise(
+    total=n(),
+    free_all=sum(admission==&quot;free admission for all visitors&quot;),
+    proportion_free=free_all/total
+  )</code></pre>
+<pre><code>## # A tibble: 4 × 4
+##   nation           total free_all proportion_free
+##   &lt;chr&gt;            &lt;int&gt;    &lt;int&gt;           &lt;dbl&gt;
+## 1 England            240        0               0
+## 2 Northern Ireland     9        0               0
+## 3 Scotland            97        0               0
+## 4 Wales                2        0               0</code></pre>
 </div>
 <div id="exercise-o." class="section level3">
 <h3>Exercise o.</h3>
@@ -677,7 +706,18 @@ attractions that have free admission for all visitors?</em></p>
 to 2022. Of the tourist attractions in Scotland, sort into increasing
 numerical order the types of admission charges based on the mean
 percentage change in visitor numbers.</em></p>
-<pre class="r"><code># Write your code here</code></pre>
+<pre class="r"><code>visitors_with_nations %&gt;%
+  filter(nation==&quot;Scotland&quot;) %&gt;%
+  mutate(percent_change=100*(n_2022-n_2021)/n_2021) %&gt;%
+  group_by(admission) %&gt;%
+  summarise(mean_pct_change=mean(percent_change,na.rm=TRUE)) %&gt;%
+  arrange(mean_pct_change)</code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   admission mean_pct_change
+##   &lt;chr&gt;               &lt;dbl&gt;
+## 1 Charged              4.65
+## 2 Members            138.  
+## 3 Free               303.</code></pre>
 </div>
 </div>
 
